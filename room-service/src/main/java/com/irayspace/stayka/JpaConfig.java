@@ -11,21 +11,21 @@ import org.springframework.security.oauth2.jwt.Jwt;
 @Configuration
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")
 public class JpaConfig {
-  @Bean
-  public AuditorAware<String> auditorAware() {
-    return new AuditorAwareImpl();
-  }
+    @Bean
+    public AuditorAware<String> auditorAware() {
+        return new AuditorAwareImpl();
+    }
 }
 
 class AuditorAwareImpl implements AuditorAware<String> {
 
-  @Override
-  public Optional<String> getCurrentAuditor() {
-    final var authentication = SecurityContextHolder.getContext().getAuthentication();
-    if (authentication == null) {
-      return Optional.of("system");
+    @Override
+    public Optional<String> getCurrentAuditor() {
+        final var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return Optional.of("system");
+        }
+        final var principal = (Jwt) authentication.getPrincipal();
+        return Optional.of(principal.getSubject());
     }
-    final var principal = (Jwt) authentication.getPrincipal();
-    return Optional.of(principal.getSubject());
-  }
 }
