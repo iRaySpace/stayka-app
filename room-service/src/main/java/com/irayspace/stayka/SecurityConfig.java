@@ -19,38 +19,37 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-  @Bean
-  public JwtAuthenticationConverter jwtAuthenticationConverter() {
-    final var converter = new JwtAuthenticationConverter();
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        final var converter = new JwtAuthenticationConverter();
 
-    converter.setJwtGrantedAuthoritiesConverter(
-        j -> {
-          final var authorities = new ArrayList<GrantedAuthority>();
+        converter.setJwtGrantedAuthoritiesConverter(j -> {
+            final var authorities = new ArrayList<GrantedAuthority>();
 
-          final Map<String, Object> realmAccess = j.getClaim("realm_access");
-          if (realmAccess != null && realmAccess.containsKey("roles")) {
-            if (realmAccess.get("roles") instanceof List<?> roles) {
-              roles.stream()
-                  .map(String.class::cast)
-                  .forEach(r -> authorities.add(new SimpleGrantedAuthority("ROLE_" + r)));
+            final Map<String, Object> realmAccess = j.getClaim("realm_access");
+            if (realmAccess != null && realmAccess.containsKey("roles")) {
+                if (realmAccess.get("roles") instanceof List<?> roles) {
+                    roles.stream()
+                            .map(String.class::cast)
+                            .forEach(r -> authorities.add(new SimpleGrantedAuthority("ROLE_" + r)));
+                }
             }
-          }
 
-          return authorities;
+            return authorities;
         });
 
-    return converter;
-  }
+        return converter;
+    }
 
-  @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) {
-    return http.csrf(c -> c.disable())
-        .authorizeHttpRequests(
-            a -> {
-              a.requestMatchers("/swagger-ui/*", "/v3/*", "/v3/api-docs/*").permitAll();
-              a.anyRequest().authenticated();
-            })
-        .oauth2ResourceServer(o -> o.jwt(Customizer.withDefaults()))
-        .build();
-  }
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
+        return http.csrf(c -> c.disable())
+                .authorizeHttpRequests(a -> {
+                    a.requestMatchers("/swagger-ui/*", "/v3/*", "/v3/api-docs/*")
+                            .permitAll();
+                    a.anyRequest().authenticated();
+                })
+                .oauth2ResourceServer(o -> o.jwt(Customizer.withDefaults()))
+                .build();
+    }
 }
