@@ -20,66 +20,65 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 @Import(JpaConfig.class)
 public class RoomRepositoryTest {
 
-  @Autowired private RoomRepository roomRepository;
+    @Autowired
+    private RoomRepository roomRepository;
 
-  // Instance variables
-  private Room room;
+    // Instance variables
+    private Room room;
 
-  @BeforeEach
-  private void setup() {
-    room =
-        Room.builder()
-            .title("Room 2BR")
-            .description("Fancy description")
-            .location("City")
-            .price(new BigDecimal("1000.00"))
-            .bedrooms(2)
-            .imageUrl("https://example.com/image.jpg")
-            .build();
+    @BeforeEach
+    private void setup() {
+        room = Room.builder()
+                .title("Room 2BR")
+                .description("Fancy description")
+                .location("City")
+                .price(new BigDecimal("1000.00"))
+                .bedrooms(2)
+                .imageUrl("https://example.com/image.jpg")
+                .build();
 
-    final var context = SecurityContextHolder.createEmptyContext();
-    final var authentication =
-        new JwtAuthenticationToken(
-            Jwt.withTokenValue("token")
-                .header("alg", "none")
-                .claim("sub", "user-host-id")
-                .claim("email", "host@user.com")
-                .claim("name", "Host User")
-                .build(),
-            List.of(new SimpleGrantedAuthority("ROLE_host")));
-    context.setAuthentication(authentication);
+        final var context = SecurityContextHolder.createEmptyContext();
+        final var authentication = new JwtAuthenticationToken(
+                Jwt.withTokenValue("token")
+                        .header("alg", "none")
+                        .claim("sub", "user-host-id")
+                        .claim("email", "host@user.com")
+                        .claim("name", "Host User")
+                        .build(),
+                List.of(new SimpleGrantedAuthority("ROLE_host")));
+        context.setAuthentication(authentication);
 
-    SecurityContextHolder.setContext(context);
-  }
+        SecurityContextHolder.setContext(context);
+    }
 
-  @AfterEach
-  private void tearDown() {
-    SecurityContextHolder.clearContext();
-  }
+    @AfterEach
+    private void tearDown() {
+        SecurityContextHolder.clearContext();
+    }
 
-  @Test
-  public void whenSave_thenIdIsGenerated() {
-    // When
-    roomRepository.save(room);
+    @Test
+    public void whenSave_thenIdIsGenerated() {
+        // When
+        roomRepository.save(room);
 
-    // Then
-    assertThat(room.getId()).isNotNull();
-    assertThat(room.getId()).isNotEmpty();
-  }
+        // Then
+        assertThat(room.getId()).isNotNull();
+        assertThat(room.getId()).isNotEmpty();
+    }
 
-  @Test
-  public void whenSave_thenCreatedAndUpdatedIsGenerated() {
-    // When
-    roomRepository.save(room);
+    @Test
+    public void whenSave_thenCreatedAndUpdatedIsGenerated() {
+        // When
+        roomRepository.save(room);
 
-    // Then
-    assertThat(room.getCreatedAt()).isNotNull();
-    assertThat(room.getUpdatedAt()).isNotNull();
+        // Then
+        assertThat(room.getCreatedAt()).isNotNull();
+        assertThat(room.getUpdatedAt()).isNotNull();
 
-    assertThat(room.getCreatedBy()).isNotNull();
-    assertThat(room.getCreatedBy()).isEqualTo("user-host-id");
+        assertThat(room.getCreatedBy()).isNotNull();
+        assertThat(room.getCreatedBy()).isEqualTo("user-host-id");
 
-    assertThat(room.getUpdatedBy()).isNotNull();
-    assertThat(room.getCreatedBy()).isEqualTo("user-host-id");
-  }
+        assertThat(room.getUpdatedBy()).isNotNull();
+        assertThat(room.getCreatedBy()).isEqualTo("user-host-id");
+    }
 }
