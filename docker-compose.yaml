@@ -7,3 +7,45 @@ services:
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=admin
     command: start-dev
+
+  redpanda-0:
+    image: docker.redpanda.com/redpandadata/redpanda:v25.3.3
+    container_name: redpanda-0
+    ports:
+      - "18081:18081"
+      - "18082:18082"
+      - "19092:19092"
+      - "19644:9644"
+    command:
+      - redpanda
+      - start
+      - --schema-registry-addr internal://0.0.0.0:8081,external://0.0.0.0:18081
+      - --pandaproxy-addr internal://0.0.0.0:8082,external://0.0.0.0:18082
+      - --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-pandaproxy-addr internal://redpanda-0:8082,external://localhost:18082
+      - --advertise-kafka-addr internal://redpanda-0:9092,external://localhost:19092
+      - --rpc-addr redpanda-0:33145
+      - --mode dev-container
+      - --smp 1
+      - --default-log-level=info
+
+  redpanda-console:
+    image: docker.redpanda.com/redpandadata/console:v3.3.2
+    ports:
+      - "18080:8080"
+    depends_on:
+      - redpanda-0
+    environment:
+      CONFIG_FILEPATH: /tmp/config.yml
+      CONSOLE_CONFIG_FILE: |
+        schemaRegistry:
+          enabled: true
+          urls: ["http://redpanda-0:8081"]
+        kafka:
+          brokers: ["redpanda-0:9092"]
+        redpanda:
+          adminApi:
+            enabled: true
+            urls: ["http://redpanda-0:9644"]
+    entrypoint: /bin/sh
+    command: -c 'echo "$$CONSOLE_CONFIG_FILE" > /tmp/config.yml; /app/console'
