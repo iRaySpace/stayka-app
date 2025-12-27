@@ -14,12 +14,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.kafka.core.KafkaTemplate;
 
 @ExtendWith(MockitoExtension.class)
 public class RoomServiceTest {
 
     @Mock
     private RoomRepository roomRepository;
+
+    @Mock
+    private KafkaTemplate<String, Room> kafkaTemplate;
 
     private RoomService roomService;
 
@@ -29,7 +33,7 @@ public class RoomServiceTest {
 
     @BeforeEach
     private void setup() {
-        roomService = new RoomService(roomRepository);
+        roomService = new RoomService(roomRepository, kafkaTemplate);
 
         input = new CreateRoom();
         input.setTitle("Room 2BR");
@@ -78,6 +82,13 @@ public class RoomServiceTest {
         assertEquals(new BigDecimal("1000.00"), result.getPrice());
         assertEquals(2, result.getBedrooms());
         assertEquals("https://example.com/image.jpg", result.getImageUrl());
+    }
+
+    @Test
+    public void createRoom_ShouldSendKafkaMessage() {
+        when(roomRepository.save(any(Room.class))).thenReturn(room);
+        roomService.createRoom(input);
+        verify(kafkaTemplate).send("room.created", any());
     }
 
     @Test

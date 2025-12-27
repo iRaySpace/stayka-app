@@ -3,6 +3,8 @@ package com.irayspace.stayka.room;
 import com.irayspace.stayka.room.exception.RoomNotFoundException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -10,9 +12,10 @@ import org.springframework.stereotype.Service;
 public class RoomService {
 
     private final RoomRepository roomRepository;
+    private final KafkaTemplate<String, Room> kafkaTemplate;
 
     public Room createRoom(CreateRoom input) {
-        final var newRoom = Room.builder()
+        Room newRoom = Room.builder()
                 .title(input.getTitle())
                 .description(input.getDescription())
                 .location(input.getLocation())
@@ -20,7 +23,9 @@ public class RoomService {
                 .bedrooms(input.getBedrooms())
                 .imageUrl(input.getImageUrl())
                 .build();
-        return roomRepository.save(newRoom);
+        newRoom = roomRepository.save(newRoom);
+        kafkaTemplate.send("room.created", newRoom);
+        return newRoom;
     }
 
     public Optional<Room> getRoomById(String id) {
