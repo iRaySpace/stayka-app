@@ -49,3 +49,23 @@ services:
             urls: ["http://redpanda-0:9644"]
     entrypoint: /bin/sh
     command: -c 'echo "$$CONSOLE_CONFIG_FILE" > /tmp/config.yml; /app/console'
+
+  elasticsearch-0:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.2.3
+    container_name: elasticsearch-0
+    ports:
+      - "9200:9200"
+    mem_limit: 1g
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+  
+  kibana:
+    image: docker.elastic.co/kibana/kibana:9.2.3
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch-0
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch-0:9200
+      - xpack.security.enabled=false
