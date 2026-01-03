@@ -6,7 +6,7 @@ import { MatToolbar } from '@angular/material/toolbar';
   imports: [MatToolbar],
   template: `
     <mat-toolbar class="w-full shadow-md">
-      <div class="max-w-[1200px] mx-auto w-full">Stayka</div>
+      <div class="max-w-[1100px] mx-auto w-full">Stayka</div>
     </mat-toolbar>
   `,
   styles: ``,
