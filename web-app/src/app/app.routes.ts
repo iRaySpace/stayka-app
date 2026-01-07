@@ -7,6 +7,10 @@ export const routes: Routes = [
     redirectTo: 'property-listing',
   },
   {
+    path: 'add-property',
+    loadComponent: () => import('./pages/add-property/add-property'),
+  },
+  {
     path: 'property-listing',
     loadComponent: () => import('./pages/property-listing/property-listing'),
   },
