@@ -19,7 +19,27 @@ import { PropertyCard } from "../../layout/property-card/property-card";
       </div>
     </section>
     <section class="max-w-[1100px] mx-auto flex">
-      <div class="w-1/4 pl">Filters</div>
+      <div class="w-1/4 pl">
+        <fieldset>
+          <legend>Price Range</legend>
+          <div>
+            <input type="text" placeholder="MIN" />
+            <input type="text" placeholder="MAX" />
+          </div>
+          <button>Apply</button>
+        </fieldset>
+        <fieldset>
+          <legend>Bedroom</legend>
+          <div>
+            <input type="checkbox" />
+            <span>1 Bedroom</span>
+          </div>
+          <div>
+            <input type="checkbox" />
+            <span>2 Bedrooms</span>
+          </div>
+        </fieldset>
+      </div>
       <div class="w-3/4">
         <div>
           <ul class="grid grid-cols-3 gap-2">
